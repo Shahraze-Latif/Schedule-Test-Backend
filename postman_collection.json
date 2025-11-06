@@ -1,0 +1,659 @@
+{
+	"info": {
+		"_postman_id": "scheduling-system-api",
+		"name": "Scheduling System API - Complete Test Suite",
+		"description": "Complete collection for testing the Scheduling System backend API including all error cases",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "✅ Valid Requests",
+			"item": [
+				{
+					"name": "Valid Request - Example 1",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm, Tuesday 10am-3pm\",\n    \"Tuesday 11am-5pm, Friday 10am-2pm\",\n    \"Monday 8am-12pm, Friday 11am-2pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\",\n    \"10003\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Valid request with overlapping availability times. Should return 200 OK with meeting suggestions."
+					},
+					"response": []
+				},
+				{
+					"name": "Valid Request - Example 2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-3pm, Tuesday 10am-1pm\",\n    \"Tuesday 11:30am-5pm, Friday 10am-2pm\",\n    \"Monday 8am-12:30pm, Friday 11am-2pm\"\n  ],\n  \"zipCodes\": [\n    \"90210\",\n    \"90211\",\n    \"90212\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Another valid request with different zip codes and availability"
+					},
+					"response": []
+				},
+				{
+					"name": "Valid Request - Same Day Overlap",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 10am-2pm, Wednesday 2pm-5pm\",\n    \"Monday 11am-3pm, Wednesday 1pm-4pm\",\n    \"Monday 12pm-4pm, Wednesday 3pm-6pm\"\n  ],\n  \"zipCodes\": [\n    \"12345\",\n    \"12346\",\n    \"12347\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Request with clear overlapping times on Monday and Wednesday"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "❌ Error Cases - Missing Fields",
+			"item": [
+				{
+					"name": "Missing userAvailability",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\",\n    \"10003\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Missing required field: userAvailability"
+					},
+					"response": []
+				},
+				{
+					"name": "Missing zipCodes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"Tuesday 10am-3pm\",\n    \"Wednesday 2pm-5pm\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Missing required field: zipCodes"
+					},
+					"response": []
+				},
+				{
+					"name": "Empty Body",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Missing required field: userAvailability"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "❌ Error Cases - Invalid Format",
+			"item": [
+				{
+					"name": "userAvailability Not Array",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": \"Monday 9am-5pm\",\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\",\n    \"10003\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Invalid format: userAvailability must be an array"
+					},
+					"response": []
+				},
+				{
+					"name": "zipCodes Not Array",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"Tuesday 10am-3pm\",\n    \"Wednesday 2pm-5pm\"\n  ],\n  \"zipCodes\": \"10001\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Invalid format: zipCodes must be an array"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "❌ Error Cases - Wrong Count",
+			"item": [
+				{
+					"name": "Only 1 User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Expected 3 users, but received 1"
+					},
+					"response": []
+				},
+				{
+					"name": "Only 2 Users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"Tuesday 10am-3pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Expected 3 users, but received 2"
+					},
+					"response": []
+				},
+				{
+					"name": "4 Users (Too Many)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"Tuesday 10am-3pm\",\n    \"Wednesday 2pm-5pm\",\n    \"Thursday 1pm-4pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\",\n    \"10003\",\n    \"10004\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Expected 3 users, but received 4"
+					},
+					"response": []
+				},
+				{
+					"name": "Mismatched Counts",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"Tuesday 10am-3pm\",\n    \"Wednesday 2pm-5pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Expected 3 zip codes, but received 2"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "❌ Error Cases - Empty Values",
+			"item": [
+				{
+					"name": "Empty Availability String",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"\",\n    \"Wednesday 2pm-5pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\",\n    \"10003\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Empty availability detected"
+					},
+					"response": []
+				},
+				{
+					"name": "Empty Zip Code String",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"Tuesday 10am-3pm\",\n    \"Wednesday 2pm-5pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"\",\n    \"10003\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Empty zip code detected"
+					},
+					"response": []
+				},
+				{
+					"name": "Whitespace Only Values",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"   \",\n    \"Wednesday 2pm-5pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\",\n    \"10003\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 400 error: Empty availability detected (whitespace only)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "⚠️ Edge Cases",
+			"item": [
+				{
+					"name": "No Overlapping Times",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-12pm\",\n    \"Monday 2pm-5pm\",\n    \"Tuesday 10am-1pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"10002\",\n    \"10003\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Should return 200 OK but with empty meetingSuggestions array (no overlapping times found)"
+					},
+					"response": []
+				},
+				{
+					"name": "Very Far Zip Codes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userAvailability\": [\n    \"Monday 9am-5pm\",\n    \"Monday 9am-5pm\",\n    \"Monday 9am-5pm\"\n  ],\n  \"zipCodes\": [\n    \"10001\",\n    \"90210\",\n    \"33101\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/schedule",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"schedule"
+							]
+						},
+						"description": "Test with zip codes from different cities (NYC, LA, Miami). May return empty if travel time exceeds 30 min"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	]
+}
