@@ -9,31 +9,52 @@ dotenv.config();
 const app = express();
 
 // CORS configuration - allow requests from Vercel frontend and localhost
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.VERCEL_URL,
-  "http://localhost:3000",
-  "https://*.vercel.app" // Allow all Vercel preview deployments
-].filter(Boolean);
-
 const corsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Check if origin is in allowed list or is a Vercel domain
-    if (allowedOrigins.some(allowed => origin.includes(allowed || "")) || origin.includes("vercel.app")) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Allow all origins for now (you can restrict this later)
+    if (!origin) {
+      return callback(null, true);
     }
+    
+    // Get allowed origins from environment
+    const frontendUrl = process.env.FRONTEND_URL;
+    const vercelUrl = process.env.VERCEL_URL;
+    
+    // Allow localhost for development
+    if (origin === "http://localhost:3000" || origin === "http://localhost:3001") {
+      return callback(null, true);
+    }
+    
+    // Allow all Vercel domains (production and preview deployments)
+    if (origin.includes("vercel.app")) {
+      return callback(null, true);
+    }
+    
+    // Allow specific frontend URL if set
+    if (frontendUrl && origin === frontendUrl) {
+      return callback(null, true);
+    }
+    
+    // Allow specific Vercel URL if set
+    if (vercelUrl && origin === vercelUrl) {
+      return callback(null, true);
+    }
+    
+    // For now, allow all origins (you can restrict this later for security)
+    // In production, you might want to only allow specific domains
+    callback(null, true);
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Explicitly handle OPTIONS requests for CORS preflight
+app.options("*", cors(corsOptions));
 
 // Initialize Supabase with your credentials (you'll add them later)
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
