@@ -7,7 +7,32 @@ import axios from "axios";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// CORS configuration - allow requests from Vercel frontend and localhost
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.VERCEL_URL,
+  "http://localhost:3000",
+  "https://*.vercel.app" // Allow all Vercel preview deployments
+].filter(Boolean);
+
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list or is a Vercel domain
+    if (allowedOrigins.some(allowed => origin.includes(allowed || "")) || origin.includes("vercel.app")) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for now (you can restrict this later)
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Initialize Supabase with your credentials (you'll add them later)
@@ -326,7 +351,7 @@ Result: MUST suggest meetings for Monday (10am-2pm) and Wednesday (2pm-5pm)`;
         headers: {
           "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "http://localhost:3000",
+          "HTTP-Referer": process.env.FRONTEND_URL || process.env.VERCEL_URL || "http://localhost:3000",
           "X-Title": "Scheduling System"
         },
         timeout: 30000 // 30 second timeout
@@ -593,8 +618,19 @@ app.post("/api/schedule", async (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+if (!process.env.PORT) {
+  throw new Error("PORT environment variable is required. Please set it in your .env file or environment variables.");
+}
+
+const PORT = parseInt(process.env.PORT, 10);
+const HOST = process.env.HOST || "0.0.0.0";
+
+if (isNaN(PORT) || PORT <= 0) {
+  throw new Error(`Invalid PORT value: ${process.env.PORT}. PORT must be a positive number.`);
+}
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server is running on ${HOST}:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 });
 
